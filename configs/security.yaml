@@ -1,0 +1,13 @@
+jwt:
+  algorithm: HS256
+  ttl_minutes: 15          # short-lived tokens
+  issuer: ftl
+  audience: ftl-api
+roles: [public, sdma, forecaster, scientist, admin]   # DESIGN §1A role mapping
+rate_limit:
+  requests_per_minute: 120
+  burst: 30
+  verify_per_minute: 30
+cors_allow_origins:
+  - http://localhost:5173
+max_body_bytes: 262144

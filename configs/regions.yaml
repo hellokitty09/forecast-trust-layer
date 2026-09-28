@@ -1,0 +1,74 @@
+# 36 IMD subdivisions. IDs must match ui/src/lib/regions.ts (OPEN_QUESTIONS #7).
+regions:
+- id: IMD_SUB_JK_LADAKH
+  name: Jammu & Kashmir and Ladakh
+- id: IMD_SUB_HIMACHAL
+  name: Himachal Pradesh
+- id: IMD_SUB_PUNJAB
+  name: Punjab
+- id: IMD_SUB_UTTARAKHAND
+  name: Uttarakhand
+- id: IMD_SUB_ARUNACHAL
+  name: Arunachal Pradesh
+- id: IMD_SUB_HAR_CHD_DEL
+  name: Haryana, Chandigarh & Delhi
+- id: IMD_SUB_W_RAJASTHAN
+  name: West Rajasthan
+- id: IMD_SUB_W_UP
+  name: West Uttar Pradesh
+- id: IMD_SUB_E_UP
+  name: East Uttar Pradesh
+- id: IMD_SUB_BIHAR
+  name: Bihar
+- id: IMD_SUB_SHWB_SIKKIM
+  name: Sub-Himalayan West Bengal & Sikkim
+- id: IMD_SUB_ASSAM_MEGHALAYA
+  name: Assam & Meghalaya
+- id: IMD_SUB_NMMT
+  name: Nagaland, Manipur, Mizoram & Tripura
+- id: IMD_SUB_E_RAJASTHAN
+  name: East Rajasthan
+- id: IMD_SUB_W_MP
+  name: West Madhya Pradesh
+- id: IMD_SUB_E_MP
+  name: East Madhya Pradesh
+- id: IMD_SUB_JHARKHAND
+  name: Jharkhand
+- id: IMD_SUB_GANGETIC_WB
+  name: Gangetic West Bengal
+- id: IMD_SUB_SAURASHTRA_KUTCH
+  name: Saurashtra & Kutch
+- id: IMD_SUB_GUJARAT
+  name: Gujarat Region
+- id: IMD_SUB_VIDARBHA
+  name: Vidarbha
+- id: IMD_SUB_CHHATTISGARH
+  name: Chhattisgarh
+- id: IMD_SUB_ODISHA
+  name: Odisha
+- id: IMD_SUB_KONKAN_GOA
+  name: Konkan & Goa
+- id: IMD_SUB_MADHYA_MAHARASHTRA
+  name: Madhya Maharashtra
+- id: IMD_SUB_MARATHWADA
+  name: Marathwada
+- id: IMD_SUB_TELANGANA
+  name: Telangana
+- id: IMD_SUB_COASTAL_AP
+  name: Coastal Andhra Pradesh & Yanam
+- id: IMD_SUB_COASTAL_KARNATAKA
+  name: Coastal Karnataka
+- id: IMD_SUB_N_INT_KARNATAKA
+  name: North Interior Karnataka
+- id: IMD_SUB_RAYALASEEMA
+  name: Rayalaseema
+- id: IMD_SUB_S_INT_KARNATAKA
+  name: South Interior Karnataka
+- id: IMD_SUB_TN_PUDUCHERRY
+  name: Tamil Nadu, Puducherry & Karaikal
+- id: IMD_SUB_KERALA_MAHE
+  name: Kerala & Mahe
+- id: IMD_SUB_LAKSHADWEEP
+  name: Lakshadweep
+- id: IMD_SUB_ANDAMAN_NICOBAR
+  name: Andaman & Nicobar Islands

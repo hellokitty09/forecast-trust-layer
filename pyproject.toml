@@ -1,0 +1,75 @@
+[project]
+name = "ftl"
+version = "0.1.0"
+description = "Forecast Trust Layer — SIH26079"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+  "pyyaml>=6.0",
+  "pynacl>=1.5",
+  "pyjwt>=2.9",
+  "lxml>=5.3",
+]
+
+[project.optional-dependencies]
+pipeline = [
+    "dask>=2026.8.0",
+    "gcsfs>=2026.8.1",
+    "imdlib>=0.1.22",
+    "matplotlib>=3.11.2",
+    "netcdf4>=1.7.4",
+    "numpy>=2.4.6",
+    "pandas>=3.0.6",
+    "scores>=2.7.0",
+    "xarray>=2026.7.0",
+    "zarr>=3.1.6",
+    "lightgbm>=4.5",
+    "scikit-learn>=1.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "types-pyyaml",
+    "lxml-stubs",
+    "bandit>=1.7",
+    "pip-audit>=2.7",
+    "pandas-stubs>=3.0.5.260914",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ftl"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "N", "SIM", "RUF"]
+ignore = ["S101", "E501", "RUF001", "RUF002", "RUF003"]  # E501: formatter owns line length; RUF00x: domain text uses × and –
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+files = ["src"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# scientific libraries without type information
+module = ["scores.*", "gcsfs.*", "numcodecs.*", "imdlib.*", "dask.*", "sklearn.*", "lightgbm.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

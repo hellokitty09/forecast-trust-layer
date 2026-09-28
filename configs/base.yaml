@@ -1,0 +1,12 @@
+seed: 42
+paths:
+  cards: data/cards/cards.jsonl        # signed, hash-chained Trust Cards (append-only)
+  analogs: data/analogs/analogs.jsonl  # analog cases written by models/analogs (M4)
+  audit: data/audit/audit.jsonl        # hash-chained audit log (outputs, feedback, overrides)
+  feedback: data/feedback/feedback.jsonl
+  reports: reports                     # validation pack written by `make eval` (DESIGN §10)
+lead_days: {min: 1, max: 10}
+cycles_utc: [0, 6, 12, 18]
+variables: [rain, tmax, wind850, wind200]
+# DESIGN §5.3: monsoon is onset-relative per region. Names are file keys for reports/bias/<variable>/<season>.json
+seasons: [pre_monsoon, monsoon, post_monsoon, winter]

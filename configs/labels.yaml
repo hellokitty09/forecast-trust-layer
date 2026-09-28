@@ -1,0 +1,36 @@
+# DESIGN §7. M0 settings; all tunable, all documented.
+seasons:                 # IMD's standard seasons, by the month the forecast window starts
+  winter: [1, 2]
+  pre_monsoon: [3, 4, 5]
+  monsoon: [6, 7, 8, 9]  # calendar JJAS for M0; onset-relative monsoon is OPEN_QUESTIONS #18
+  post_monsoon: [10, 11, 12]
+m0:
+  eval_years: [2016, 2017, 2018, 2019, 2020, 2021]   # 2022 held out for M1+ tests
+  seeps_climatology_years: [1986, 2015]              # IMD years before the evaluation period → no leakage
+  dry_threshold_mm: 0.2                              # SEEPS dry/light split (Rodwell et al. 2010)
+  seeps_p1_valid: [0.1, 0.85]                        # SEEPS undefined outside (Rodwell et al. 2010)
+  min_samples: 30                                    # per cell × lead; fewer → no value, not a guess
+  alignment_min_margin: 0.02                         # IMD date-shift test must win by this correlation margin
+bootstrap:               # DESIGN §10 block bootstrap by date
+  block_days: 7
+  n_boot: 1000
+  ci: 0.95
+
+# M2 v0 — first real LightGBM models (DESIGN §8.2 B, C). Scoped to what's actually downloaded:
+# only June+July are complete for every year 2016-2022 (Aug missing 2020-22, Sep missing entirely).
+# A single time-based train/test split is used here, not full leave-one-year-out (hard rule 6 is still
+# respected: the split is by year, never by row) — full LOYO is future work once more months are downloaded.
+m2:
+  train_years: [2016, 2017, 2018, 2019, 2020, 2021]
+  test_years: [2022]
+  months: [6, 7]                    # the only months complete across every one of the years above
+  bust:
+    quantile: 0.93                   # DESIGN §7.3, q in 0.90-0.95, threshold fit on train fold only
+    rain_floor_mm: 10.0              # DESIGN §7.3 absolute floor
+  monotone_bias_feature: true        # bust probability must not decrease as |train-fold bias| increases
+  bootstrap_n_boot: 200              # smaller than the M0 default (1000) — kept tractable on ~3M held-out rows
+  lightgbm:
+    num_leaves: 31
+    learning_rate: 0.05
+    n_estimators: 200
+    min_child_samples: 200

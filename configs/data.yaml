@@ -1,0 +1,21 @@
+# DESIGN §5. M0 = IFS HRES (WeatherBench 2) vs IMD 0.25° gridded rain.
+india_domain:            # DESIGN §5.2 verification domain
+  lat: [5.0, 38.0]
+  lon: [65.0, 100.0]
+wb2_hres:
+  url: gs://weatherbench2/datasets/hres/2016-2022-0012-1440x721.zarr
+  variable: total_precipitation_24hr   # accumulation over the 24 h ending at init + lead (metres)
+  init_hour_utc: 0                     # 00 UTC cycles only (DESIGN §4)
+  years: [2016, 2017, 2018, 2019, 2020, 2021, 2022]
+  lead_days: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  workers: 32
+# Plausibility limits for daily rain, applied after unit conversion (hard rule 3 / §5.6)
+rain_mm_day:
+  max_physical: 2500.0
+  negative_tolerance_mm: 0.1   # GRIB packing noise; below this → error, not clipped
+imd_rain:
+  dir: data/raw/imd_rain       # official IMD 0.25° yearly binaries (imdlib 'yearwise' format)
+  missing_value: -999.0
+paths:
+  interim: data/interim
+  provenance: data/provenance/manifest.jsonl

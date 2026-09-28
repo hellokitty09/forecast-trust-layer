@@ -1,0 +1,21 @@
+# DESIGN §11. Confidence bands on bust_prob: HIGH < medium_from <= MEDIUM < low_from <= LOW
+confidence:
+  medium_from: 0.2
+  low_from: 0.5
+# Public tier returns rounded probabilities only (DESIGN §14, extraction resistance)
+public_round_step: 0.1
+alerts:
+  default_threshold: 0.5
+  default_lead_min: 1
+schema_version: "1.1"   # 1.1 adds issued_at / supersedes / update_reason (Live Bust Watch)
+# Error Anatomy shares must sum to 1 within this tolerance
+anatomy_sum_tolerance: 0.02
+# CAP 1.2 export (DESIGN §11). sender must be set to the issuing authority's address before deployment.
+cap:
+  sender: ftl@localhost
+  sender_name: Forecast Trust Layer (SIH26079 prototype)
+  event: Forecast confidence advisory
+  restriction: For SDMA / forecaster use. Describes confidence in an NWP forecast, not a weather warning.
+  geocode_name: IMD_SUBDIVISION
+# DESIGN §10: per-system scores with fewer events than this are labelled "indicative"
+indicative_below: 30
