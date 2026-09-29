@@ -22,7 +22,7 @@ interface AppState {
   recheckApi: () => void;
   token: string | null;
   setToken: (t: string | null) => void;
-  /** Decoded from the token, for UI display/gating only — the server is the real enforcement point. */
+  /** Decoded from the token, for UI display/gating only - the server is the real enforcement point. */
   role: Role | null;
 }
 

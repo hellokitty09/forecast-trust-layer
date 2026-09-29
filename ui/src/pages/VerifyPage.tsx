@@ -33,18 +33,18 @@ export function VerifyPage() {
 
   const onFile = (f: File | undefined) => {
     if (!f) return;
-    if (f.size > 1_000_000) return setV({ kind: "bad-json", msg: "File larger than 1 MB — not a Trust Card." });
+    if (f.size > 1_000_000) return setV({ kind: "bad-json", msg: "File larger than 1 MB - not a Trust Card." });
     f.text().then(setText);
   };
 
   return (
-    <div className="page">
+    <div className="page verify-page">
       <div className="page-head">
         <div>
           <h1>Verify a Trust Card</h1>
           <p>
-            Paste or upload a Trust Card. The server checks its Ed25519 signature and its place in the hash chain, so
-            anyone can confirm a card was issued by FTL and has not been altered.
+            Verification controls are shown for the prototype workflow. This preview has no signing service connected,
+            so it cannot confirm a card as authentic or unchanged.
           </p>
         </div>
       </div>
@@ -124,7 +124,20 @@ function BlackBox() {
 }
 
 function VerdictView({ v }: { v: Verdict }) {
-  if (v.kind === "idle") return <p className="muted" style={{ margin: 0 }}>No card checked yet.</p>;
+  if (v.kind === "idle") return (
+    <div className="verify-idle">
+      <svg className="verify-idle-art" viewBox="0 0 120 76" fill="none" aria-hidden="true">
+        <path d="M25 15.5h46a6 6 0 0 1 6 6v42a6 6 0 0 1-6 6H25a6 6 0 0 1-6-6v-42a6 6 0 0 1 6-6Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M31 28h31M31 37h24M31 46h17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="82" cy="47" r="20" fill="#f4f3ed" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M75 47.5 80 52l9-10" stroke="#176b65" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M69 15c8-7 17-9 27-6m-24 9c8-5 16-5 24-2" stroke="#c58b54" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+      <strong>No card checked yet</strong>
+      <p>Paste or upload a Trust Card above to inspect its signature and history chain.</p>
+      <div className="verify-steps" aria-label="Verification steps"><span>Trust Card</span><i /><span>Signature</span><i /><span>History chain</span></div>
+    </div>
+  );
   if (v.kind === "checking") return <p className="muted" style={{ margin: 0 }}>Checking signature and chain…</p>;
   if (v.kind === "bad-json")
     return <Box cls="tampered" icon="!" color="var(--c-low)" title="Not a readable Trust Card" body={v.msg} />;
@@ -139,8 +152,8 @@ function VerdictView({ v }: { v: Verdict }) {
         <Box cls="tampered" icon="✕" color="var(--c-low)" title="Tampered or not issued by FTL" body={r.detail ?? "Signature or hash-chain check failed. Do not rely on this card."} />
       )}
       <dl className="kv">
-        <dt>Signature</dt><dd>{r.signature_valid == null ? "—" : r.signature_valid ? "valid" : "invalid"}</dd>
-        <dt>Hash chain</dt><dd>{r.chain_valid == null ? "—" : r.chain_valid ? "valid" : "broken"}</dd>
+        <dt>Signature</dt><dd>{r.signature_valid == null ? "-" : r.signature_valid ? "valid" : "invalid"}</dd>
+        <dt>Hash chain</dt><dd>{r.chain_valid == null ? "-" : r.chain_valid ? "valid" : "broken"}</dd>
       </dl>
       {v.schemaNote && <div className="tag warn" style={{ whiteSpace: "normal" }}>Schema warning: {v.schemaNote}</div>}
     </>

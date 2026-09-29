@@ -1,4 +1,4 @@
-// IMD 0.25° land cells drawn as squares on a canvas. No boundary lines — only the observation grid itself
+// IMD 0.25° land cells drawn as squares on a canvas. No boundary lines - only the observation grid itself
 // (hard rule 9). Cells without a value are drawn light grey, never as zero.
 import { useEffect, useMemo, useRef, useState } from "react";
 

@@ -1,4 +1,4 @@
-// Client-side JWT role decode — for UI display/gating only. The server (src/ftl/serve/auth.py)
+// Client-side JWT role decode - for UI display/gating only. The server (src/ftl/serve/auth.py)
 // is the real enforcement point; nothing here is a security boundary.
 export const ROLES = ["public", "sdma", "forecaster", "scientist", "admin"] as const;
 export type Role = (typeof ROLES)[number];

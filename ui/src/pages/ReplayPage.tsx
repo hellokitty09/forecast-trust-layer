@@ -22,13 +22,13 @@ export function ReplayPage() {
       <div className="page-head">
         <div>
           <h1>Replay</h1>
-          <p>Step through a real historical forecast cycle lead day by lead day, then reveal what actually happened.</p>
+          <p>Explore preview scenarios lead day by lead day. Outcomes here are generated for interface review, not verified observations.</p>
         </div>
         {index.kind === "ok" && index.value.cases.length > 0 && (
           <label className="field">
-            <span>Case</span>
+            <span>Preview scenario</span>
             <select value={file ?? ""} onChange={(e) => setFile(e.target.value)}>
-              {index.value.cases.map((c) => <option key={c.file} value={c.file}>{c.title} — {fmtInit(c.init_time)}</option>)}
+              {index.value.cases.map((c) => <option key={c.file} value={c.file}>{c.title} - {fmtInit(c.init_time)}</option>)}
             </select>
           </label>
         )}
@@ -37,7 +37,7 @@ export function ReplayPage() {
       {(index.kind === "error" || (index.kind === "ok" && index.value.cases.length === 0)) && (
         <div className="card">
           <EmptyState title="No replay cases available">
-            Replays are built from real historical cycles with verified outcomes.
+            Verified historical cycles are not connected to this preview.
           </EmptyState>
         </div>
       )}
@@ -99,7 +99,7 @@ function ReplayBody({ rc, lead, setLead, reveal, setReveal, sel, setSel }: {
           {sel && (
             <div>
               <b>{regionName(sel)}</b> · Day {lead}: predicted {pct(cell(sel)?.bust_prob)} bust probability
-              {reveal && <> — outcome: <b>{truth[sel] === true ? "bust" : truth[sel] === false ? "no bust" : "observation uncertain"}</b></>}
+              {reveal && <> - outcome: <b>{truth[sel] === true ? "bust" : truth[sel] === false ? "no bust" : "observation uncertain"}</b></>}
             </div>
           )}
         </div>

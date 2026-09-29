@@ -1,6 +1,6 @@
 // Mock data engine for the Forecast Trust Layer hackathon prototype.
-// Produces varied, realistic-looking data per region × variable × lead.
-// No backend needed — everything runs client-side.
+// Produces varied, clearly labeled illustrative values per region × variable × lead.
+// No backend needed - everything runs client-side.
 import { REGIONS } from "../lib/regions";
 import { confidenceFor, type MapSnapshot, type TrustCard, type Variable, type Analog } from "../lib/schema";
 import type { BiasResponse } from "../lib/reports";
@@ -20,21 +20,21 @@ function hashRange(seed: string, min: number, max: number): number {
 // ── Meteorological reason banks ──
 const REASONS: Record<Variable, string[]> = {
   rain: [
-    "LPS track spread over central India — ensemble members diverge on landfall position",
-    "BSISO entering break phase — monsoon trough retreating northward",
+    "LPS track spread over central India - ensemble members diverge on landfall position",
+    "BSISO entering break phase - monsoon trough retreating northward",
     "Moisture convergence over Western Ghats highly sensitive to SST forcing",
     "Uncertainty in mid-tropospheric vortex position over Bay of Bengal",
     "Run-to-run flip in cross-equatorial flow intensity",
   ],
   tmax: [
-    "WD arrival timing uncertain over J&K — ±24h spread in ensemble",
+    "WD arrival timing uncertain over J&K - ±24h spread in ensemble",
     "Soil-moisture feedback amplifying surface temperature uncertainty",
     "Run-to-run jump in 850 hPa temperature advection",
     "Anti-cyclonic subsidence strength uncertain over Rajasthan",
     "Urban heat island signal not resolved at model grid spacing",
   ],
   wind850: [
-    "Somali Jet strength uncertain — linked to Indian Ocean dipole phase",
+    "Somali Jet strength uncertain - linked to Indian Ocean dipole phase",
     "LPS track spread affecting low-level convergence patterns",
     "Monsoon onset surge timing varies by 36h across ensemble",
     "Cross-equatorial flow modulation by MJO phase 2-3 transition",
@@ -73,13 +73,13 @@ export function mockMap(init: string, lead: number, variable: Variable): MapSnap
   for (const r of REGIONS) {
     const horizon = skillHorizon(r.id, variable);
     if (lead > horizon) {
-      regions[r.id] = { region_id: r.id, status: "NO_SKILL", confidence: null, bust_prob: null, illustrative: false };
+      regions[r.id] = { region_id: r.id, status: "NO_SKILL", confidence: null, bust_prob: null, illustrative: true };
     } else {
       const p = Math.round(bustProb(r.id, variable, lead) * 100) / 100;
-      regions[r.id] = { region_id: r.id, status: "OK", confidence: confidenceFor(p), bust_prob: p, illustrative: false };
+      regions[r.id] = { region_id: r.id, status: "OK", confidence: confidenceFor(p), bust_prob: p, illustrative: true };
     }
   }
-  return { init_time: init, lead_day: lead, variable, regions, illustrative: false, source: "api" };
+  return { init_time: init, lead_day: lead, variable, regions, illustrative: true, source: "illustrative" };
 }
 
 // ── Trust card ──
@@ -132,43 +132,38 @@ export function mockCard(init: string, lead: number, variable: Variable, regionI
     novelty: { score: +hashRange(`nov|${regionId}`, 0.05, 0.55).toFixed(2), unprecedented: false },
     obs_certainty: "HIGH",
     analog_ids: [],
-    model: { version: "FTL-v0.9.2-monsoon", sha256: "a3f8b2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3" },
-    inputs: { source: "ECMWF IFS 0.25° + IMD gridded obs", sha256: "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7" },
-    illustrative: false,
-    signature: `ed25519:${hash01(`sig|${regionId}|${variable}|${lead}`).toString(16).repeat(8).slice(0, 64)}`,
-    prev_hash: `sha256:${hash01(`prev|${regionId}|${variable}|${lead}`).toString(16).repeat(8).slice(0, 64)}`,
+    model: { version: "preview-only", sha256: "not-computed" },
+    inputs: { source: "Generated preview scenario - no verified forecast or observation input", sha256: "not-computed" },
+    illustrative: true,
+    signature: undefined,
+    prev_hash: "not-linked-preview-card",
     issued_at: init,
   };
 }
 
-// ── Analogs (realistic past events) ──
+// ── Illustrative analog-search examples; these are not historical events ──
 const ANALOG_BANK: Record<Variable, Analog[]> = {
   rain: [
-    { date: "2018-08-14", system: "Kerala Floods (LPS)", outcome: "Severe persistent rain, model underestimated by 80mm", busted: true },
-    { date: "2021-07-22", system: "Maharashtra LPS", outcome: "Unprecedented 24h rainfall at Mahabaleshwar", busted: true },
-    { date: "2019-09-25", system: "Pune cloudbursts", outcome: "Highly localized convective burst", busted: true },
-    { date: "2020-06-17", system: "Pre-monsoon surge", outcome: "Cross-equatorial flow strengthened as predicted", busted: false },
-    { date: "2023-07-10", system: "Active monsoon phase", outcome: "Monsoon trough position captured well", busted: false },
+    { date: "Scenario A", system: "Monsoon low-pressure system", outcome: "The rain corridor shifts east of the initial guidance as model runs diverge on the track.", busted: true, illustrative: true },
+    { date: "Scenario B", system: "Western disturbance", outcome: "The heaviest rain arrives a day later than the first scenario forecast.", busted: true, illustrative: true },
   ],
   tmax: [
-    { date: "2024-05-28", system: "Rajasthan heat dome", outcome: "48.6°C observed vs 45°C forecast", busted: true },
-    { date: "2023-06-02", system: "Delhi heat wave", outcome: "UHI effect exceeded model capability", busted: true },
-    { date: "2022-04-15", system: "Pre-monsoon heat", outcome: "Temperature peak captured within 1.5°C", busted: false },
+    { date: "Scenario A", system: "Heat wave onset", outcome: "Hot conditions begin earlier and cover a wider area than the first scenario forecast.", busted: true, illustrative: true },
+    { date: "Scenario B", system: "Persistent hot spell", outcome: "The forecast captures the peak day but misses the local temperature maximum.", busted: true, illustrative: true },
   ],
   wind850: [
-    { date: "2019-06-01", system: "Monsoon onset surge", outcome: "Somali Jet wind exceeded 30m/s", busted: true },
-    { date: "2020-07-18", system: "LPS approach", outcome: "Low-level convergence pattern verified", busted: false },
-    { date: "2023-09-05", system: "Late monsoon LPS", outcome: "Track shifted 200km east from consensus", busted: true },
+    { date: "Scenario A", system: "Monsoon low-pressure system", outcome: "The low-level convergence zone forms farther east than the first scenario forecast.", busted: true, illustrative: true },
+    { date: "Scenario B", system: "Monsoon flow transition", outcome: "The cross-equatorial flow strengthens one cycle later than expected.", busted: true, illustrative: true },
   ],
   wind200: [
-    { date: "2022-07-20", system: "TEJ strengthening", outcome: "200 hPa easterlies underestimated by 8m/s", busted: true },
-    { date: "2021-08-10", system: "WD interaction", outcome: "Jet streak position verified", busted: false },
+    { date: "Scenario A", system: "Tropical easterly jet", outcome: "The jet core is displaced north of the first scenario forecast.", busted: true, illustrative: true },
+    { date: "Scenario B", system: "Subtropical westerly trough", outcome: "The trough arrives earlier than the first scenario forecast.", busted: true, illustrative: true },
   ],
 };
 
 export function mockAnalogs(variable: Variable, regionId: string): Analog[] {
   const pool = ANALOG_BANK[variable];
-  const n = 2 + Math.floor(hash01(`ana|${regionId}`) * Math.min(3, pool.length));
+  const n = Math.min(2, pool.length);
   const start = Math.floor(hash01(`anas|${regionId}`) * pool.length);
   const result: Analog[] = [];
   for (let i = 0; i < n; i++) result.push(pool[(start + i) % pool.length]!);
@@ -184,18 +179,18 @@ export function mockHistory(init: string, lead: number, variable: Variable, regi
     card_id: current.card_id + "-v1",
     confidence: confidenceFor(Math.min(0.95, p + 0.15)),
     bust_prob: +Math.min(0.95, p + 0.15).toFixed(2),
-    issued_at: new Date(new Date(init).getTime() - 24 * 3600000).toISOString(),
-    update_reason: "Initial issuance — limited ensemble convergence",
+    issued_at: new Date(new Date(init).getTime() - 12 * 3600000).toISOString(),
+    update_reason: "Example update: model runs show a wider range",
   };
   const v2: TrustCard = {
     ...current,
     card_id: current.card_id + "-v2",
     confidence: confidenceFor(Math.min(0.95, p + 0.06)),
     bust_prob: +Math.min(0.95, p + 0.06).toFixed(2),
-    issued_at: new Date(new Date(init).getTime() - 12 * 3600000).toISOString(),
-    update_reason: "12Z cycle: ensemble members converging, bias correction updated",
+    issued_at: new Date(new Date(init).getTime() - 6 * 3600000).toISOString(),
+    update_reason: "Example update: model-run spread narrows",
   };
-  current.update_reason = "Latest 00Z cycle — final forecast";
+  current.update_reason = "Current example card";
   return [v1, v2, current];
 }
 
@@ -268,7 +263,7 @@ export function mockAlerts(init: string, leadMin: number, threshold: number): Al
             bust_prob: c.bust_prob,
             confidence: c.confidence!,
             reasons: [reasonPool[ri]!],
-            illustrative: false,
+            illustrative: true,
           });
         }
       }
@@ -308,9 +303,9 @@ export function mockBias(variable: Variable, season: string): BiasResponse {
     lead: null,
     bias: {
       generated_at: "2026-09-27T18:00:00Z",
-      source: "ECMWF IFS 0.25° reforecast 2020-2025",
-      truth: "IMD 0.25° gridded observations",
-      illustrative: false,
+      source: "Generated preview values - no verified forecast archive",
+      truth: "No verified observation comparison",
+      illustrative: true,
       variable,
       unit,
       season,
@@ -319,9 +314,9 @@ export function mockBias(variable: Variable, season: string): BiasResponse {
     },
     skill_horizon: {
       generated_at: "2026-09-27T18:00:00Z",
-      source: "ECMWF IFS 0.25° reforecast 2020-2025",
-      truth: "IMD 0.25° gridded observations",
-      illustrative: false,
+      source: "Generated preview values - no verified forecast archive",
+      truth: "No verified observation comparison",
+      illustrative: true,
       variable,
       metric: "SEEPS skill vs climatology",
       lead_days: leadDays,
@@ -367,10 +362,10 @@ export function mockScorecard() {
 
   return {
     generated_at: "2026-09-27T18:00:00Z",
-    source: "ECMWF IFS 0.25° reforecast 2020-2025",
-    truth: "IMD 0.25° gridded observations",
-    illustrative: false,
-    split: "leave-one-year-out (2020-2025)",
+    source: "Generated preview values - no verified forecast archive",
+    truth: "No verified observation comparison",
+    illustrative: true,
+    split: "No validation split - generated interface preview",
     rows,
     reliability: {
       FTL: [[0.1, 0.08, 85], [0.2, 0.18, 120], [0.3, 0.27, 95], [0.4, 0.38, 78], [0.5, 0.52, 64], [0.6, 0.58, 45], [0.7, 0.72, 32], [0.8, 0.83, 18], [0.9, 0.91, 8]] as [number, number, number][],
@@ -383,19 +378,19 @@ export function mockScorecard() {
 export function mockReplayIndex() {
   return {
     cases: [
-      { init_time: "2018-08-08T00:00:00Z", variable: "rain", title: "Kerala Floods 2018", file: "kerala-2018.json" },
-      { init_time: "2023-07-09T00:00:00Z", variable: "rain", title: "Delhi NCR Yamuna Flood 2023", file: "delhi-2023.json" },
-      { init_time: "2024-05-25T00:00:00Z", variable: "tmax", title: "Rajasthan Heat Wave 2024", file: "rajasthan-heat-2024.json" },
+      { init_time: "2018-08-08T00:00:00Z", variable: "rain", title: "Preview · Monsoon rainfall scenario A", file: "kerala-2018.json" },
+      { init_time: "2023-07-09T00:00:00Z", variable: "rain", title: "Preview · Northern plains rainfall scenario B", file: "delhi-2023.json" },
+      { init_time: "2024-05-25T00:00:00Z", variable: "tmax", title: "Preview · Hot-day forecast scenario C", file: "rajasthan-heat-2024.json" },
     ],
   };
 }
 
 export function mockReplayCase(file: string) {
-  const defaultCfg = { init: "2018-08-08T00:00:00Z", variable: "rain" as Variable, title: "Kerala Floods 2018", desc: "The worst floods in Kerala in nearly a century. The IFS model showed increasing uncertainty from Day 3, but the confidence signal was drowned out by ensemble noise." };
+  const defaultCfg = { init: "2018-08-08T00:00:00Z", variable: "rain" as Variable, title: "Preview · Monsoon rainfall scenario A", desc: "Generated interface scenario showing how a forecaster could review changing rainfall confidence across lead days." };
   const configMap: Record<string, typeof defaultCfg> = {
     "kerala-2018.json": defaultCfg,
-    "delhi-2023.json": { init: "2023-07-09T00:00:00Z", variable: "rain", title: "Delhi NCR Yamuna Flood 2023", desc: "Extreme rainfall caused record Yamuna levels. FTL flagged high bust probability from Day 2, driven by monsoon trough oscillation." },
-    "rajasthan-heat-2024.json": { init: "2024-05-25T00:00:00Z", variable: "tmax", title: "Rajasthan Heat Wave 2024", desc: "Tmax exceeded 48°C in parts of Rajasthan. Model bias correction was insufficient due to unprecedented surface conditions." },
+    "delhi-2023.json": { init: "2023-07-09T00:00:00Z", variable: "rain", title: "Preview · Northern plains rainfall scenario B", desc: "Generated interface scenario for inspecting a high-risk rainfall pattern. It is not a verified event replay." },
+    "rajasthan-heat-2024.json": { init: "2024-05-25T00:00:00Z", variable: "tmax", title: "Preview · Hot-day forecast scenario C", desc: "Generated interface scenario for the maximum-temperature workflow. It is not a verified heat-wave replay." },
   };
   const cfg = configMap[file] ?? defaultCfg;
 
@@ -411,7 +406,7 @@ export function mockReplayCase(file: string) {
         status: lead <= skillHorizon(r.id, cfg.variable) ? "OK" : "NO_SKILL",
         confidence: confidenceFor(p),
         bust_prob: +p.toFixed(2),
-        illustrative: false,
+        illustrative: true,
       };
       const didBust = hash01(`truth|${r.id}|${cfg.variable}|${lead}`) > 0.55;
       truthData[String(lead)]![r.id] = p > 0.6 ? didBust : p > 0.3 ? !didBust : false;
@@ -423,9 +418,9 @@ export function mockReplayCase(file: string) {
   // ReplayCaseSchema declares `truth` as the latter. We place the metadata string in `source`.
   const result: Record<string, unknown> = {
     generated_at: "2026-09-27T18:00:00Z",
-    source: "ECMWF IFS 0.25° reforecast",
+    source: "Generated preview scenario - not a historical forecast replay",
     truth: truthData,
-    illustrative: false,
+    illustrative: true,
     init_time: cfg.init,
     variable: cfg.variable,
     title: cfg.title,
@@ -442,7 +437,7 @@ export function mockCapXml(cardId: string): Blob {
   <identifier>${cardId}</identifier>
   <sender>FTL-SIH26079</sender>
   <sent>${new Date().toISOString()}</sent>
-  <status>Actual</status>
+  <status>Exercise</status>
   <msgType>Alert</msgType>
   <scope>Public</scope>
   <info>
@@ -451,7 +446,7 @@ export function mockCapXml(cardId: string): Blob {
     <urgency>Expected</urgency>
     <severity>Moderate</severity>
     <certainty>Likely</certainty>
-    <headline>Forecast Trust Layer — Low confidence alert</headline>
+    <headline>Forecast Trust Layer - Low confidence alert</headline>
     <description>The FTL system has flagged this region-day with elevated bust probability. Forecasters should review the Trust Card for error anatomy details.</description>
   </info>
 </alert>`;

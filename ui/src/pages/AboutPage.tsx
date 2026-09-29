@@ -1,10 +1,10 @@
-// DESIGN §1A — who FTL is for and why. Text only; no numbers.
+// DESIGN §1A - who FTL is for and why. Text only; no numbers.
 import { NavLink } from "react-router-dom";
 
 const USERS = [
   {
     who: "Duty forecaster",
-    where: "NCMRWF operations, IMD national and regional centres — each model cycle",
+    where: "NCMRWF operations, IMD national and regional centres - each model cycle",
     decides: "Warning colour and wording (\"likely\" vs \"very likely\"), and whether to hold a warning until the next run.",
     gets: "Where and when not to trust the forecast, why, and what to do about it, with similar past cases.",
     views: [["/", "Confidence map"], ["/alerts", "Alerts"]],
@@ -28,7 +28,7 @@ const USERS = [
   },
   {
     who: "Sector advisory services",
-    where: "Agromet, reservoir / hydropower, power-grid planning — through IMD, not directly",
+    where: "Agromet, reservoir / hydropower, power-grid planning - through IMD, not directly",
     decides: "Weekly advisories: sowing, spraying, irrigation, water release, load planning.",
     gets: "A confidence qualifier carried through IMD products.",
     views: [],
@@ -62,7 +62,7 @@ const ROLES = [
 
 export function AboutPage() {
   return (
-    <div className="page" style={{ maxWidth: 1040 }}>
+    <div className="page about-page" style={{ maxWidth: 1040 }}>
       <div className="page-head">
         <div>
           <h1>Who this is for</h1>
@@ -75,8 +75,19 @@ export function AboutPage() {
         </div>
       </div>
 
+      <figure className="about-hero" aria-label="Decorative monsoon atmosphere artwork">
+        <img src="/images/monsoon-atmosphere.jpg" alt="" />
+        <div className="about-hero-shade" />
+        <div className="about-hero-copy">
+          <span>THE DECISION SUPPORT LAYER</span>
+          <strong>Forecasts describe what may happen.<br />Trust signals help decide what to do next.</strong>
+          <p>Built for the people who review forecasts, prepare for risk, and improve the models behind them.</p>
+        </div>
+        <figcaption>Atmospheric artwork · no forecast data shown</figcaption>
+      </figure>
+
       <blockquote className="usp">
-        We don't predict the weather better — we tell the forecaster when the existing forecast should{" "}
+        We don't predict the weather better - we tell the forecaster when the existing forecast should{" "}
         <b>NOT</b> be trusted, how likely it is to bust, how uncertain it is, and why.
       </blockquote>
 
@@ -102,14 +113,14 @@ export function AboutPage() {
 
         <section className="card card-pad">
           <h2 style={{ marginBottom: 10 }}>Why each user will use it</h2>
-          <table className="tbl">
+          <div className="about-table-wrap"><table className="tbl">
             <thead><tr><th>User</th><th>Reason to adopt</th><th>Value measure</th></tr></thead>
             <tbody>
               {VALUE.map(([who, reason, measure]) => (
                 <tr key={who}><td>{who}</td><td>{reason}</td><td className="muted">{measure}</td></tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </section>
 
         <section className="card card-pad">
@@ -134,12 +145,12 @@ export function AboutPage() {
 
         <section className="card card-pad">
           <h2 style={{ marginBottom: 10 }}>Roles</h2>
-          <table className="tbl">
+          <div className="about-table-wrap"><table className="tbl">
             <thead><tr><th>Role</th><th>Who</th><th>Can</th></tr></thead>
             <tbody>
               {ROLES.map(([r, who, can]) => <tr key={r}><td className="mono">{r}</td><td>{who}</td><td>{can}</td></tr>)}
             </tbody>
-          </table>
+          </table></div>
         </section>
 
         <section className="card card-pad">

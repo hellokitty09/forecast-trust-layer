@@ -1,4 +1,4 @@
-// Alerts list — the duty forecaster's "few risky region-days out of hundreds", and the SDMA's CAP feed.
+// Alerts list - the duty forecaster's "few risky region-days out of hundreds", and the SDMA's CAP feed.
 import { useState } from "react";
 import { getAlerts, getCap } from "../api/client";
 import { InitPicker } from "../components/Controls";
@@ -16,11 +16,13 @@ export function AlertsPage() {
   const { init, setInit, token } = useApp();
   const [leadMin, setLeadMin] = useState(1);
   const [threshold, setThreshold] = useState(0.5);
+  const [visibleCount, setVisibleCount] = useState(10);
   const res = useAsync(
     async () => getAlerts(init, leadMin, threshold),
     [init, leadMin, threshold, token],
   );
   const [capErr, setCapErr] = useState<string | null>(null);
+  const visibleAlerts = res.kind === "ok" ? res.value.alerts.slice(0, visibleCount) : [];
 
   return (
     <div className="page">
@@ -28,7 +30,7 @@ export function AlertsPage() {
         <div>
           <h1>Low-confidence alerts</h1>
           <p>
-            The region-days where today's forecast is most likely to bust, ranked. Forecasters: check these before
+            Preview alert scenarios ranked by their generated bust-risk values. Forecasters: review this workflow before
             setting warning colour and wording. SDMAs: download the CAP alert, which carries the confidence and trust
             horizon.
           </p>
@@ -36,18 +38,18 @@ export function AlertsPage() {
         <span className="tag">FORECASTER · SDMA</span>
       </div>
 
-      <div className="card card-pad" style={{ marginBottom: 16 }}>
+        <div className="card card-pad alert-filters" style={{ marginBottom: 16 }}>
         <div className="controls">
-          <InitPicker value={init} onChange={setInit} />
+          <InitPicker value={init} onChange={(value) => { setInit(value); setVisibleCount(10); }} />
           <label className="field">
             <span>From lead day</span>
-            <select value={leadMin} onChange={(e) => setLeadMin(Number(e.target.value))}>
+            <select value={leadMin} onChange={(e) => { setLeadMin(Number(e.target.value)); setVisibleCount(10); }}>
               {Array.from({ length: 10 }, (_, i) => <option key={i} value={i + 1}>Day {i + 1}</option>)}
             </select>
           </label>
           <label className="field">
             <span>Bust probability ≥</span>
-            <select value={threshold} onChange={(e) => setThreshold(Number(e.target.value))}>
+            <select value={threshold} onChange={(e) => { setThreshold(Number(e.target.value)); setVisibleCount(10); }}>
               {THRESHOLDS.map((t) => <option key={t} value={t}>{pct(t)}</option>)}
             </select>
           </label>
@@ -64,50 +66,56 @@ export function AlertsPage() {
         </div>
       )}
       {res.kind === "ok" && (
-        <div className="card card-pad">
-          <div className="tc-row" style={{ marginBottom: 10 }}>
-            <div className="muted">
-              init {fmtInit(res.value.init_time)} ·{" "}
-              <b>{res.value.alerts.length}</b> alert{res.value.alerts.length === 1 ? "" : "s"}
+        <section className="card card-pad alerts-results">
+          <div className="alerts-results-head">
+            <div>
+              <span className="eyebrow">CYCLE REVIEW</span>
+              <h2 className="alerts-cycle-title">{fmtInit(res.value.init_time)}</h2>
             </div>
+            <div className="alerts-count"><strong>{res.value.alerts.length}</strong><span>region-day alerts</span></div>
             {res.value.unavailable > 0 && (
               <span className="tag warn" title="Region × lead × variable slots with no valid card">
-                {res.value.unavailable} SLOTS UNAVAILABLE — NOT ALERTS, BUT NOT "FINE" EITHER
+                {res.value.unavailable} slots unavailable - status unknown
               </span>
             )}
           </div>
-          {capErr && <div className="faint" style={{ marginBottom: 8 }}>CAP unavailable: {capErr}</div>}
+          {capErr && <div className="alerts-error" role="status">CAP export unavailable: {capErr}</div>}
           {res.value.alerts.length === 0 ? (
             <EmptyState title="No alerts at this threshold">
               No scored region-day reaches this threshold, and none is LOW confidence.
             </EmptyState>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table className="tbl">
-                <thead>
-                  <tr><th>Region</th><th>Variable</th><th className="r">Lead</th><th className="r">Bust prob.</th><th>Confidence</th><th>Why</th><th /></tr>
-                </thead>
-                <tbody>
-                  {res.value.alerts.map((a) => (
-                    <tr key={a.card_id}>
-                      <td>{a.region_name ?? a.region_id}</td>
-                      <td>{VARIABLE_LABEL[a.variable]}</td>
-                      <td className="r num">Day {a.lead_day}</td>
-                      <td className="r num">{pct(a.bust_prob)}</td>
-                      <td><span className="conf-badge" style={{ background: CONF_COLOR[a.confidence], padding: "1px 8px", fontSize: 12 }}>{a.confidence}</span></td>
-                      <td className="muted">{a.reasons.join("; ") || "—"}</td>
-                      <td>
-                        <button className="btn" onClick={() => { setCapErr(null); getCap(a.card_id).then((b) => saveBlob(b, `cap-${a.card_id}.xml`)).catch((e: unknown) => setCapErr(errMsg(e))); }}>
-                          CAP
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="alert-list">
+              {visibleAlerts.map((a, i) => (
+                <article className="alert-item" key={a.card_id}>
+                  <div className="alert-place">
+                    <span className="alert-rank num">{String(i + 1).padStart(2, "0")}</span>
+                    <div><h3>{a.region_name ?? a.region_id}</h3><p>{VARIABLE_LABEL[a.variable]} <span>·</span> Day {a.lead_day}</p></div>
+                  </div>
+                  <div className="alert-risk">
+                    <strong className="num">{pct(a.bust_prob)}</strong>
+                    <span>estimated bust probability</span>
+                    <span className="conf-badge" style={{ background: CONF_COLOR[a.confidence] }}>{a.confidence} confidence</span>
+                  </div>
+                  <div className="alert-why"><span>Why it was flagged</span><p>{a.reasons.join("; ") || "No explanation available"}</p></div>
+                  <button className="btn alert-cap" onClick={() => { setCapErr(null); getCap(a.card_id).then((b) => saveBlob(b, `cap-${a.card_id}.xml`)).catch((e: unknown) => setCapErr(errMsg(e))); }}>
+                    Export CAP <span aria-hidden="true">↗</span>
+                  </button>
+                </article>
+              ))}
             </div>
           )}
-        </div>
+          {res.value.alerts.length > 10 && (
+            <div className="alert-pagination">
+              <span>Showing {Math.min(visibleCount, res.value.alerts.length)} of {res.value.alerts.length} alerts</span>
+              {visibleCount < res.value.alerts.length ? (
+                <button className="btn" onClick={() => setVisibleCount(Math.min(visibleCount + 10, res.value.alerts.length))}>Show 10 more</button>
+              ) : (
+                <button className="btn" onClick={() => setVisibleCount(10)}>Show first 10</button>
+              )}
+            </div>
+          )}
+        </section>
       )}
     </div>
   );

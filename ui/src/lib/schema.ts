@@ -1,4 +1,4 @@
-// TrustCard + map schemas — mirror DESIGN.md §11. Anything that fails to parse
+// TrustCard + map schemas - mirror DESIGN.md §11. Anything that fails to parse
 // is rendered as UNAVAILABLE (hard rule 4: never default to high confidence).
 import { z } from "zod";
 
@@ -47,7 +47,7 @@ export const TrustCardSchema = z.object({
   model: z.object({ version: z.string(), sha256: z.string() }),
   inputs: z.object({ source: z.string(), sha256: z.string() }),
   illustrative: z.boolean().default(false),
-  // schema 1.1 — Live Bust Watch: when this version was issued and what it replaced
+  // schema 1.1 - Live Bust Watch: when this version was issued and what it replaced
   issued_at: z.string().nullable().optional(),
   supersedes: z.string().nullable().optional(),
   update_reason: z.string().nullable().optional(),
@@ -80,6 +80,7 @@ export const AnalogSchema = z.object({
   outcome: z.string(),
   distance: z.number().optional(),
   busted: z.boolean().nullable().optional(),
+  illustrative: z.boolean().default(false),
 });
 export type Analog = z.infer<typeof AnalogSchema>;
 

@@ -1,5 +1,5 @@
-// Schematic tile layout of IMD subdivisions. Deliberately NOT geographic
-// (hard rule 9) — used until official boundaries are supplied.
+// Compact schematic alternative. The main dashboard uses GeoMap's true
+// geographic IMD subdivision boundaries.
 import { REGIONS } from "../lib/regions";
 import type { MapSnapshot, MapRegion } from "../lib/schema";
 import { CONF_COLOR, STATUS_LABEL, STATUS_SHORT, pct } from "../lib/display";

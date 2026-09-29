@@ -21,13 +21,13 @@ export const STATUS_SHORT: Record<Status, string> = {
 };
 
 export const STATUS_EXPLAIN: Record<Exclude<Status, "OK">, string> = {
-  UNAVAILABLE: "Input missing, invalid or out of range. No confidence is shown — this is not a sign the forecast is fine.",
-  NO_SKILL: "Beyond the skill horizon. No useful skill — do not use this forecast.",
+  UNAVAILABLE: "Input missing, invalid or out of range. No confidence is shown - this is not a sign the forecast is fine.",
+  NO_SKILL: "Beyond the skill horizon. No useful skill - do not use this forecast.",
   OBS_UNCERTAIN: "IMD and IMERG disagree or gauge density is low here, so busts cannot be verified.",
 };
 
 export function pct(p: number | null | undefined, digits = 0): string {
-  return p == null ? "—" : `${(p * 100).toFixed(digits)}%`;
+  return p == null ? "-" : `${(p * 100).toFixed(digits)}%`;
 }
 
 export function fmtInit(iso: string): string {

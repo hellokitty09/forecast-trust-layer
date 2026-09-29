@@ -57,7 +57,7 @@ export function GridSection({ g }: { g: GridReport }) {
         </section>
 
         <section className="card card-pad" style={{ display: "grid", gap: 8 }}>
-          <h2>Skill horizon — last useful lead day</h2>
+          <h2>Skill horizon - last useful lead day</h2>
           <p className="muted" style={{ margin: 0 }}>
             Last lead day at which SEEPS skill's {Math.round(g.ci * 100)}% lower bound stays above zero on every day
             up to it. {noSkill > 0 && <>{noSkill} cells have no useful skill even on Day 1.</>}

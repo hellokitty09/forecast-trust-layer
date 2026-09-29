@@ -1,6 +1,6 @@
 // API client for the FTL prototype.
 // In hackathon mode, all calls are served by the mock data engine.
-// No backend needed — everything runs client-side with realistic simulated data.
+// No backend needed - everything runs client-side with realistic simulated data.
 import {
   parseCard,
   type Analog,
@@ -13,18 +13,15 @@ import { ScorecardSchema, type GridReport, type Scorecard } from "../lib/reports
 import {
   mockMap,
   mockCard,
-  mockAnalogs,
-  mockHistory,
   mockHealth,
-  mockChain,
-  mockKeys,
-  mockVerify,
   mockAlerts,
   mockBias,
   mockScorecard,
   mockReplayIndex,
   mockReplayCase,
   mockCapXml,
+  mockAnalogs,
+  mockHistory,
 } from "./mockdata";
 
 export class ApiError extends Error {
@@ -82,9 +79,9 @@ export async function getTrustCard(init: string, lead: number, region: string, v
   return p.ok ? { card: p.card, raw } : { card: null, error: p.error, raw };
 }
 
-export async function getCases(cardId: string, variable?: Variable, regionId?: string): Promise<Analog[]> {
-  await new Promise(r => setTimeout(r, 150));
-  return mockAnalogs(variable ?? "rain", regionId ?? cardId);
+export async function getCases(_cardId: string, variable: Variable = "rain", regionId = ""): Promise<Analog[]> {
+  await new Promise(r => setTimeout(r, 180));
+  return mockAnalogs(variable, regionId);
 }
 
 export async function getCap(cardId: string): Promise<Blob> {
@@ -99,8 +96,8 @@ export interface VerifyResult {
   detail?: string;
 }
 
-export async function verifyCard(card: unknown): Promise<VerifyResult> {
-  return mockVerify(card);
+export async function verifyCard(_card: unknown): Promise<VerifyResult> {
+  throw new ApiError("Preview build: cryptographic verification is not connected", 503);
 }
 
 export async function getBias(variable: Variable, season: string) {
@@ -119,7 +116,7 @@ export async function getScorecard(): Promise<Scorecard> {
 }
 
 export async function getHistory(init: string, lead: number, region: string, variable: Variable): Promise<TrustCard[]> {
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise(r => setTimeout(r, 180));
   return mockHistory(init, lead, variable, region);
 }
 
@@ -135,14 +132,12 @@ export const ChainStatusSchema = z.object({
 export type ChainStatus = z.infer<typeof ChainStatusSchema>;
 
 export async function getChain(): Promise<ChainStatus> {
-  await new Promise(r => setTimeout(r, 200));
-  return mockChain();
+  throw new ApiError("Preview build: signed-card chain is not connected", 503);
 }
 
 export const PublicKeySchema = z.object({ key_id: z.string(), alg: z.string(), public_key: z.string(), current: z.boolean() });
 export async function getKeys(): Promise<z.infer<typeof PublicKeySchema>[]> {
-  await new Promise(r => setTimeout(r, 100));
-  return mockKeys();
+  throw new ApiError("Preview build: signing keys are not connected", 503);
 }
 
 export const AlertSchema = z.object({

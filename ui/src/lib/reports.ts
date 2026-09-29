@@ -1,16 +1,16 @@
 // Schemas for validation-pack reports written by `make eval` (DESIGN §10). Bias, skill and scorecard
 // come from /v1/bias and /v1/scorecard; replay still comes from static files in ui/public/reports/.
-// The UI renders only what these contain — it never computes or fills in a metric (hard rule 1).
+// The UI renders only what these contain - it never computes or fills in a metric (hard rule 1).
 import { z } from "zod";
 
 const meta = {
   generated_at: z.string(),
   source: z.string(), // forecast data, e.g. "GEFSv12 reforecast 2000–2019"
-  truth: z.string(), // verifying observations, e.g. "IMD 0.25° gridded rain" — always shown
+  truth: z.string(), // verifying observations, e.g. "IMD 0.25° gridded rain" - always shown
   illustrative: z.boolean().default(false),
 };
 
-/** reports/m0/bias_map.json — DESIGN §7.1 error-prone area map. */
+/** reports/m0/bias_map.json - DESIGN §7.1 error-prone area map. */
 export const BiasMapSchema = z.object({
   ...meta,
   variable: z.string(),
@@ -22,7 +22,7 @@ export const BiasMapSchema = z.object({
 });
 export type BiasMap = z.infer<typeof BiasMapSchema>;
 
-/** reports/m0/skill_horizon.json — DESIGN §7.4 / model A. */
+/** reports/m0/skill_horizon.json - DESIGN §7.4 / model A. */
 export const SkillHorizonSchema = z.object({
   ...meta,
   variable: z.string(),
@@ -39,7 +39,7 @@ export const SkillHorizonSchema = z.object({
 });
 export type SkillHorizon = z.infer<typeof SkillHorizonSchema>;
 
-/** reports/scorecard.json — DESIGN §10. */
+/** reports/scorecard.json - DESIGN §10. */
 export const ScorecardSchema = z.object({
   ...meta,
   split: z.string(),
@@ -78,7 +78,7 @@ export const BiasResponseSchema = z.object({
 });
 export type BiasResponse = z.infer<typeof BiasResponseSchema>;
 
-/** GET /v1/bias/grid — M0 grid-level bias + SEEPS skill on IMD land cells. */
+/** GET /v1/bias/grid - M0 grid-level bias + SEEPS skill on IMD land cells. */
 const nums = z.array(z.number().nullable());
 export const GridReportSchema = z.object({
   ...meta,
@@ -116,7 +116,7 @@ export const SEASON_LABEL: Record<(typeof SEASONS)[number], string> = {
   winter: "Winter",
 };
 
-/** reports/replay/index.json + reports/replay/<init>.json — DESIGN §12.4. */
+/** reports/replay/index.json + reports/replay/<init>.json - DESIGN §12.4. */
 export const ReplayIndexSchema = z.object({
   cases: z.array(z.object({ init_time: z.string(), variable: z.string(), title: z.string(), file: z.string() })),
 });
